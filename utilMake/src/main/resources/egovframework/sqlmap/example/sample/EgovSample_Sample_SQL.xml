@@ -3,9 +3,6 @@
 
 <sqlMap namespace="Sample">
 
-	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
-	<typeAlias  alias="searchVO" type="egovframework.example.sample.service.SampleDefaultVO"/>
-
 	<resultMap id="sample" class="egovframework.example.sample.service.SampleVO">
 		<result property="id" column="id"/>
 		<result property="name" column="name"/>
