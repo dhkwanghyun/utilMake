@@ -53,12 +53,18 @@
            	document.listForm.submit();
         }
         
+        /* 파일Drop 화면 function */
+        function fn_egov_fileDrop() {
+           	document.listForm.action = "<c:url value='/fileDorpTest.do'/>";
+           	document.listForm.submit();
+        }
+        
         //-->
     </script>
 </head>
 
 <body style="text-align:center; margin:0 auto; display:inline; padding-top:100px;">
-    <form:form commandName="searchVO" id="listForm" name="listForm" method="post">
+    <form:form commandName="searchVO" id="listForm" name="listForm" method="get">
         <input type="hidden" name="selectedId" />
         <div id="content_pop">
         	<!-- 타이틀 -->
@@ -127,6 +133,11 @@
         	</div>
         	<div id="sysbtn">
         	  <ul>
+        	  	  <li>
+        	      	  <span class="btn_blue_l">
+        	              <a href="javascript:fn_egov_fileDrop();">파일 드랍Test</a>
+        	      	  </span>
+        	      </li>
         	      <li>
         	          <span class="btn_blue_l">
         	              <a href="javascript:fn_egov_addView();"><spring:message code="button.create" /></a>

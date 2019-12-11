@@ -15,8 +15,11 @@
  */
 package egovframework.example.sample.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import egovframework.example.cmmn.util.FileUtils;
 import egovframework.example.sample.service.EgovSampleService;
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
@@ -25,10 +28,13 @@ import egovframework.rte.fdl.cmmn.EgovAbstractServiceImpl;
 import egovframework.rte.fdl.idgnr.EgovIdGnrService;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 /**
  * @Class Name : EgovSampleServiceImpl.java
@@ -59,6 +65,10 @@ public class EgovSampleServiceImpl extends EgovAbstractServiceImpl implements Eg
 	// TODO mybatis 사용
 	@Resource(name="sampleMapper")
 	private SampleMapper sampleDAO;
+	
+	//fileUtil
+	@Resource(name="fileUtils")
+	private FileUtils fileUtils;
 
 	/** ID Generation */
 	@Resource(name = "egovIdGnrService")
@@ -80,6 +90,12 @@ public class EgovSampleServiceImpl extends EgovAbstractServiceImpl implements Eg
 		LOGGER.debug(vo.toString());
 
 		sampleDAO.insertSample(vo);
+		
+		/*List<Map<String,Object>> list = fileUtils.parseInsertFileInfo(map, request);
+		for(int i=0, size=list.size(); i<size; i++){
+			sampleDAO.insertFile(list.get(i));
+		}*/
+		
 		return id;
 	}
 
@@ -139,6 +155,34 @@ public class EgovSampleServiceImpl extends EgovAbstractServiceImpl implements Eg
 	@Override
 	public int selectSampleListTotCnt(SampleDefaultVO searchVO) {
 		return sampleDAO.selectSampleListTotCnt(searchVO);
+	}
+
+	
+	@Override
+	@Transactional
+	public boolean fileTestInsert(SampleVO sampleVO, HttpServletRequest files) throws Exception {
+		
+		//시쿼스 반환
+		sampleDAO.insertFileSample(sampleVO);
+		
+		
+		if(sampleVO.getSampleSeq()!=0){
+			Map<String,Object> map = new HashMap<>();
+			map.put("tableName", "file_sample");
+			map.put("idx", sampleVO.getSampleSeq());
+			
+			List<Map<String,Object>> list = fileUtils.parseInsertFileInfo(map, files);
+			for(int i=0, size=list.size(); i<size; i++){
+				sampleDAO.insertFile(list.get(i));
+			}
+		}
+		
+		return false;
+	}
+
+	@Override
+	public List<?> selectFileList(SampleVO sampleVO) throws Exception {
+		return sampleDAO.selectFileList(sampleVO);
 	}
 
 }

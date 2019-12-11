@@ -15,7 +15,9 @@
  */
 package egovframework.example.sample.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import egovframework.example.sample.service.EgovSampleService;
 import egovframework.example.sample.service.SampleDefaultVO;
@@ -25,6 +27,7 @@ import egovframework.rte.fdl.property.EgovPropertyService;
 import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,7 +37,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
 import org.springmodules.validation.commons.DefaultBeanValidator;
 
 /**
@@ -102,6 +109,29 @@ public class EgovSampleController {
 
 		return "sample/egovSampleList";
 	}
+	
+	/**
+	 * 글 등록 화면을 조회한다.
+	 * @param searchVO - 목록 조회조건 정보가 담긴 VO
+	 * @param model
+	 * @return "egovSampleRegister"
+	 * @exception Exception
+	 */
+	@RequestMapping(value = "/fileDorpTest.do", method = RequestMethod.GET)
+	public String fileDorpTest(@ModelAttribute("searchVO") SampleDefaultVO searchVO, Model model) throws Exception {
+		return "sample/uploadAjax";
+	}
+	
+	@RequestMapping(value = "/uploadAjax.ajax", method = RequestMethod.POST)
+	public ModelAndView fileAjax(MultipartFile file,Model model) throws Exception {
+		Map<String,Object> hashMap = new HashMap<>();
+		hashMap.put("orgFileName", file.getOriginalFilename());
+		hashMap.put("fileSize", file.getSize());
+		hashMap.put("orgFileType", file.getContentType());
+		
+		ModelAndView modelAndView = new ModelAndView("jsonView",hashMap);
+		return modelAndView;
+	}
 
 	/**
 	 * 글 등록 화면을 조회한다.
@@ -125,18 +155,27 @@ public class EgovSampleController {
 	 * @exception Exception
 	 */
 	@RequestMapping(value = "/addSample.do", method = RequestMethod.POST)
-	public String addSample(@ModelAttribute("searchVO") SampleDefaultVO searchVO, SampleVO sampleVO, BindingResult bindingResult, Model model, SessionStatus status)
+	public String addSample(@ModelAttribute("searchVO") SampleDefaultVO searchVO,
+						    HttpServletRequest files,
+							//@ModelAttribute안 붙여 있으면 스프링 알아서 매핑 form:form commandName가 일치
+							SampleVO sampleVO,
+							BindingResult bindingResult,
+							Model model,
+							SessionStatus status)
 			throws Exception {
 
 		// Server-Side Validation
 		beanValidator.validate(sampleVO, bindingResult);
-
+		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("sampleVO", sampleVO);
 			return "sample/egovSampleRegister";
 		}
 
-		sampleService.insertSample(sampleVO);
+		if(sampleService.fileTestInsert(sampleVO,files)){
+			
+		}
+		//sampleService.insertSample(sampleVO);
 		status.setComplete();
 		return "forward:/egovSampleList.do";
 	}
@@ -155,6 +194,9 @@ public class EgovSampleController {
 		sampleVO.setId(id);
 		// 변수명은 CoC 에 따라 sampleVO
 		model.addAttribute(selectSample(sampleVO, searchVO));
+		List<?> list = sampleService.selectFileList(sampleVO);
+		model.addAttribute("list",list);
+		
 		return "sample/egovSampleRegister";
 	}
 

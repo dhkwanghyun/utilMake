@@ -17,6 +17,10 @@ package egovframework.example.sample.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 /**
  * @Class Name : EgovSampleService.java
  * @Description : EgovSampleService Class
@@ -82,5 +86,15 @@ public interface EgovSampleService {
 	 * @exception
 	 */
 	int selectSampleListTotCnt(SampleDefaultVO searchVO);
+
+	/**
+	 * 
+	 * @param sampleVO
+	 * @param files 
+	 * @return 성공 실패
+	 */
+	boolean fileTestInsert(SampleVO sampleVO, HttpServletRequest files)throws Exception;
+
+	List<?> selectFileList(SampleVO sampleVO)throws Exception;
 
 }

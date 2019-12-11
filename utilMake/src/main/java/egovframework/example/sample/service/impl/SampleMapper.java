@@ -16,6 +16,7 @@
 package egovframework.example.sample.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import egovframework.example.sample.service.SampleDefaultVO;
 import egovframework.example.sample.service.SampleVO;
@@ -87,5 +88,11 @@ public interface SampleMapper {
 	 * @exception
 	 */
 	int selectSampleListTotCnt(SampleDefaultVO searchVO);
+
+	int insertFileSample(SampleVO sampleVO) throws Exception;
+
+	int insertFile(Map<String, Object> map) throws Exception;
+
+	List<?> selectFileList(SampleVO sampleVO) throws Exception;
 
 }

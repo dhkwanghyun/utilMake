@@ -24,7 +24,7 @@ import egovframework.rte.psl.dataaccess.EgovAbstractDAO;
 import egovframework.rte.psl.dataaccess.EgovAbstractMapper;
 
 import org.springframework.stereotype.Repository;
-
+//ibaties시 사용
 /**
  * @Class Name : SampleDAO.java
  * @Description : Sample DAO Class

@@ -49,6 +49,10 @@ public class SampleVO extends SampleDefaultVO {
 
 	/** 등록자 */
 	private String regUser;
+	
+
+	/** 시퀀스 테스트 */
+	private int sampleSeq=0;
 
 	public String getId() {
 		return id;
@@ -90,4 +94,11 @@ public class SampleVO extends SampleDefaultVO {
 		this.regUser = regUser;
 	}
 
+	public int getSampleSeq() {
+		return sampleSeq;
+	}
+	
+	public void setSampleSeq(int sampleSeq) {
+		this.sampleSeq = sampleSeq;
+	}
 }

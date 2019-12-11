@@ -21,20 +21,20 @@
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <%@ include file="/WEB-INF/jsp/egovframework/example/cmmn/include/include-header.jspf" %>
     <c:set var="registerFlag" value="${empty sampleVO.id ? 'create' : 'modify'}"/>
     <title>Sample <c:if test="${registerFlag == 'create'}"><spring:message code="button.create" /></c:if>
                   <c:if test="${registerFlag == 'modify'}"><spring:message code="button.modify" /></c:if>
     </title>
-    <link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/sample.css'/>"/>
     
     <!--For Commons Validator Client Side-->
     <script type="text/javascript" src="<c:url value='/cmmn/validator.do'/>"></script>
     <validator:javascript formName="sampleVO" staticJavascript="false" xhtml="true" cdata="false"/>
     
     <script type="text/javaScript" language="javascript" defer="defer">
-        <!--
+
         /* 글 목록 화면 function */
         function fn_egov_selectList() {
            	document.detailForm.action = "<c:url value='/egovSampleList.do'/>";
@@ -57,13 +57,12 @@
                 frm.submit();
             }
         }
-        
-        -->
+
     </script>
 </head>
 <body style="text-align:center; margin:0 auto; display:inline; padding-top:100px;">
 
-<form:form commandName="sampleVO" id="detailForm" name="detailForm">
+<form:form commandName="sampleVO" id="detailForm" name="detailForm" enctype="multipart/form-data" method="post">
     <div id="content_pop">
     	<!-- 타이틀 -->
     	<div id="title">
@@ -123,6 +122,30 @@
         				&nbsp;<form:errors path="regUser" /></td>
                     </c:if>
     		</tr>
+    		<tr>
+    			<td class="tbtd_caption"><label for="regUser">파일업로드</label></td>
+    			<td class="tbtd_content">
+                    <c:if test="${registerFlag == 'modify'}">
+                    	<c:forEach var="row" items="${list }">
+						<p>
+							<input type="hidden" id="fileSeq" value="${row.fileSeq }">
+							<a href="#this" name="file">${row.originalFileName }</a> 
+							(${row.fileSize }kb)
+						</p>
+						</c:forEach>
+                    </c:if>
+                    <c:if test="${registerFlag != 'modify'}">
+				      <div id="fileDiv">
+						<p>
+							<input type="file" id="file" name="file_0">
+							<a href="#this" class="btn" id="delete" name="delete">삭제</a>
+						</p>
+					  </div>
+					  <br/><br/>
+					  <a href="#this" class="btn" id="addFile">파일 추가</a>
+                    </c:if>
+                </td>
+    		</tr>
     	</table>
       </div>
     	<div id="sysbtn">
@@ -164,5 +187,51 @@
     <input type="hidden" name="searchKeyword" value="<c:out value='${searchVO.searchKeyword}'/>"/>
     <input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
 </form:form>
+<%@ include file="/WEB-INF/jsp/egovframework/example/cmmn/include/include-body.jspf" %>
+<script type="text/javascript">
+	var gfv_count = 1;
+
+	$(document).ready(function(){
+		
+		$("#addFile").on("click", function(e){ //파일 추가 버튼
+			e.preventDefault();
+			fn_addFile();
+		});
+		
+		$("a[name='delete']").on("click", function(e){ //삭제 버튼
+			e.preventDefault();
+			fn_deleteFile($(this));
+		});
+		
+		$("a[name='file']").on("click", function(e){ //파일 이름
+			e.preventDefault();
+			fn_downloadFile($(this));
+		});
+		
+	});
+	
+	function fn_addFile(){
+		var str = "<p><input type='file' name='file_"+(gfv_count++)+"'><a href='#this' class='btn' name='delete'>삭제</a></p>";
+		$("#fileDiv").append(str);
+		$("a[name='delete']").on("click", function(e){ //삭제 버튼
+			e.preventDefault();
+			fn_deleteFile($(this));
+		});
+	}
+	
+	function fn_deleteFile(obj){
+		obj.parent().remove();
+	}
+	
+	function fn_downloadFile(obj){
+		var fileSeq = obj.parent().find("#fileSeq").val();
+		var comSubmit = new ComSubmit();
+		comSubmit.setUrl("<c:url value='/common/downloadFile.do' />");
+		comSubmit.addParam("fileSeq", fileSeq);
+		comSubmit.submit();
+	}
+</script>
+
+
 </body>
 </html>
